@@ -8,21 +8,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class ScaleImage {
-  /**
-   * @param args
-   * @throws IOException 
-   */
   public static void main(String[] args) throws IOException {
-    // TODO Auto-generated method stub
     EventQueue.invokeLater(new Runnable() {
       @Override
       public void run() {
-        // TODO Auto-generated method stub
         JFrame frame = null;
         try {
         	frame = new ImageViewerFrame();
         } catch (IOException e) {
-        	// TODO Auto-generated catch block
         	e.printStackTrace();
         }
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
