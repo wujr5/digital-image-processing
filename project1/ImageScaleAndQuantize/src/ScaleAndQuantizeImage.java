@@ -81,7 +81,7 @@ class ImageViewerFrame extends JFrame {
 		  }
 		}
 		
-		File newFile = new File("./image/" + fileName);
+		File newFile = new File(imagePath + fileName);
 		ImageIO.write(grayImage, "png", newFile);
 	}
 	
@@ -107,7 +107,7 @@ class ImageViewerFrame extends JFrame {
   		try {
   			String fileTail = "_" + width + "_" + height + ".png";
 				saveImageAsFile(size.width, size.height, result, fileName + fileTail);
-				label.setIcon(new ImageIcon("./image/" + fileName + fileTail));
+				label.setIcon(new ImageIcon(imagePath + fileName + fileTail));
 				setTitle(width + "*" + height);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -121,7 +121,7 @@ class ImageViewerFrame extends JFrame {
   		int[] result = getImageRGBArray(img);
   		try {
   			saveImageAsFile(img.getWidth(), img.getHeight(), result, fileName + "_" + level + "L.png");
-  			label.setIcon(new ImageIcon("./image/" +  fileName + "_" + level + "L.png"));
+  			label.setIcon(new ImageIcon(imagePath +  fileName + "_" + level + "L.png"));
   			setTitle(fileName + ".png " + level + " Level");
   		} catch (IOException e) {
   			e.printStackTrace();
@@ -143,11 +143,11 @@ class ImageViewerFrame extends JFrame {
         int result = chooser.showOpenDialog(null);
         if(result == JFileChooser.APPROVE_OPTION){
           String name = chooser.getSelectedFile().getPath();
-          imagePath = name;
-          fileName = imagePath.substring(imagePath.lastIndexOf('/') + 1, imagePath.lastIndexOf('.'));
+          imagePath = name.substring(0, name.lastIndexOf('/') + 1);
+          fileName = name.substring(name.lastIndexOf('/') + 1);
           System.out.println(fileName);
           try {
-						imageScale = new BilineInterpolationScale(imagePath);
+						imageScale = new BilineInterpolationScale(imagePath + fileName);
 						imageQuantize = new ImageQuantize(imageScale.image);
 						imageRGBArray = getImageRGBArray(imageScale.image);
 					} catch (IOException e) {
