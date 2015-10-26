@@ -13,16 +13,18 @@ public class BilineInterpolationScale {
 		double[][][] input3DData = processOneToThreeDeminsion(inPixelsData, srcH, srcW);
 		
 		int[][][] outputThreeDeminsionData = new int[destH][destW][4];
-		float rowRatio = ((float)srcH)/((float)destH);
-		float colRatio = ((float)srcW)/((float)destW);
-		for(int row=0; row<destH; row++) {
-			// convert to three dimension data
-			double srcRow = ((float)row)*rowRatio;
+		float rowRatio = ((float)srcH) / ((float)destH);
+		float colRatio = ((float)srcW) / ((float)destW);
+		
+		for(int row = 0; row < destH; row++) {
+			
+			double srcRow = ((float)row) * rowRatio;
 			double j = Math.floor(srcRow);
 			double t = srcRow - j;
-			for(int col=0; col<destW; col++) {
+			
+			for(int col = 0; col < destW; col++) {
 				
-				double srcCol = ((float)col)*colRatio;
+				double srcCol = ((float)col) * colRatio;
 				double k = Math.floor(srcCol);
 				double u = srcCol - k;
 				
@@ -34,10 +36,11 @@ public class BilineInterpolationScale {
 				for (int i = 0; i < 4; i++) {
 					outputThreeDeminsionData[row][col][i] = (int)(
 						coffiecent1 * input3DData[getClip((int)j, srcH - 1, 0)][getClip((int)k, srcW - 1, 0)][i] +
-						coffiecent2 * input3DData[getClip((int)(j+1), srcH - 1, 0)][getClip((int)k, srcW - 1, 0)][i] +
-						coffiecent3 * input3DData[getClip((int)(j+1), srcH - 1, 0)][getClip((int)(k + 1),srcW - 1, 0)][i] +
+						coffiecent2 * input3DData[getClip((int)(j + 1), srcH - 1, 0)][getClip((int)k, srcW - 1, 0)][i] +
+						coffiecent3 * input3DData[getClip((int)(j + 1), srcH - 1, 0)][getClip((int)(k + 1),srcW - 1, 0)][i] +
 						coffiecent4 * input3DData[getClip((int)j, srcH - 1, 0)][getClip((int)(k + 1), srcW - 1, 0)][i]
 					);
+					
 				}
 			}
 		}
@@ -46,7 +49,7 @@ public class BilineInterpolationScale {
 	}
 	
 	private int getClip(int x, int max, int min) {
-		return x>max ? max : x<min? min : x;
+		return x > max ? max : x < min ? min : x;
 	}
 	
 	public int[] convertToOneDim(int[][][] data, int imgCols, int imgRows) {
@@ -54,14 +57,16 @@ public class BilineInterpolationScale {
 
 		for (int row = 0, cnt = 0; row < imgRows; row++) {
 			for (int col = 0; col < imgCols; col++) {
-				oneDPix[cnt] = ((data[row][col][0] << 24) & 0xFF000000)
+				
+				oneDPix[cnt] = 
+							((data[row][col][0] << 24) & 0xFF000000)
 						| ((data[row][col][1] << 16) & 0x00FF0000)
 						| ((data[row][col][2] << 8) & 0x0000FF00)
 						| ((data[row][col][3]) & 0x000000FF);
+				
 				cnt++;
 			}
 		}
-		
 		return oneDPix;
 	}
 	
@@ -75,12 +80,13 @@ public class BilineInterpolationScale {
 				aRow[col] = oneDPix2[element];
 			}
 			
-			for(int col=0; col<imgCols; col++) {
+			for(int col = 0; col < imgCols; col++) {
 				tempData[row][col][0] = (aRow[col] >> 24) & 0xFF; // alpha
 				tempData[row][col][1] = (aRow[col] >> 16) & 0xFF; // red
 				tempData[row][col][2] = (aRow[col] >> 8) & 0xFF;  // green
 				tempData[row][col][3] = (aRow[col]) & 0xFF;       // blue
 			}
+			
 		}
 		return tempData;
 	}

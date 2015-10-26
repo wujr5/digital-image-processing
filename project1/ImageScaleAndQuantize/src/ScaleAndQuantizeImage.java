@@ -7,7 +7,7 @@ import javax.imageio.*;
 import java.io.File;
 import java.io.IOException;
 
-public class ScaleImage {
+public class ScaleAndQuantizeImage {
   public static void main(String[] args) throws IOException {
     EventQueue.invokeLater(new Runnable() {
       @Override
@@ -29,6 +29,8 @@ class ImageViewerFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public BilineInterpolationScale imageScale;
+	public ImageQuantize imageQuantize;
+	
 	public int[] imageRGBArray;
 	
 	private JLabel label;
@@ -40,7 +42,7 @@ class ImageViewerFrame extends JFrame {
 
 	public ImageViewerFrame() throws IOException { 
     
-    setTitle("ImageViewer");
+    setTitle("Scale and Quantize Image");
     setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
     label = new JLabel();
@@ -57,6 +59,7 @@ class ImageViewerFrame extends JFrame {
     add2_2_2Menu(menubar);
     add2_2_3Menu(menubar);
     add2_2_4Menu(menubar);
+    add2_3Menu(menubar);
     
     imagePath = "";
   }
@@ -71,7 +74,7 @@ class ImageViewerFrame extends JFrame {
   }
 	
 	public void saveImageAsFile(int width, int height, int[] result, String fileName) throws IOException {
-		BufferedImage grayImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage grayImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for(int i= 0 ; i < height; i++) {
 		    for(int j = 0 ; j < width; j++) {
 				grayImage.setRGB(j, i, result[i * width + j]);
@@ -82,9 +85,9 @@ class ImageViewerFrame extends JFrame {
 		ImageIO.write(grayImage, "png", newFile);
 	}
 	
-	public int[] getImageRGBArray() {
-		int width = imageScale.image.getWidth();
-		int height = imageScale.image.getHeight();
+	public int[] getImageRGBArray(BufferedImage img) {
+		int width = img.getWidth();
+		int height = img.getHeight();
 		
 		int[] RGBArray = new int[width * height];
 		
@@ -96,6 +99,35 @@ class ImageViewerFrame extends JFrame {
 		
 		return RGBArray;
 	}
+
+  public void scaleImageAndSaveTheFile(int width, int height) {
+		if (imagePath != "") {
+			Size size = new Size(width, height);
+  		int[] result = scale(imageScale.image, size);
+  		try {
+  			String fileTail = "_" + width + "_" + height + ".png";
+				saveImageAsFile(size.width, size.height, result, fileName + fileTail);
+				label.setIcon(new ImageIcon("./image/" + fileName + fileTail));
+				setTitle(width + "*" + height);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+  }
+  
+  public void quantizeImageAndSaveTheFile(int level) {
+  	if (imagePath != "") {
+  		BufferedImage img = imageQuantize.quantize(imageQuantize.grayImage, level);
+  		int[] result = getImageRGBArray(img);
+  		try {
+  			saveImageAsFile(img.getWidth(), img.getHeight(), result, fileName + "_" + level + "L.png");
+  			label.setIcon(new ImageIcon("./image/" +  fileName + "_" + level + "L.png"));
+  			setTitle(fileName + ".png " + level + " Level");
+  		} catch (IOException e) {
+  			e.printStackTrace();
+  		}
+  	}
+  }
 
   public void addFileMenu(JMenuBar menubar) {
     JMenu menu = new JMenu("File");
@@ -116,7 +148,8 @@ class ImageViewerFrame extends JFrame {
           System.out.println(fileName);
           try {
 						imageScale = new BilineInterpolationScale(imagePath);
-						imageRGBArray = getImageRGBArray();
+						imageQuantize = new ImageQuantize(imageScale.image);
+						imageRGBArray = getImageRGBArray(imageScale.image);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -138,22 +171,6 @@ class ImageViewerFrame extends JFrame {
     menu.add(exitItem);
   }
   
-  public void scaleImageAndSaveTheFile(int width, int height) {
-		if (imagePath != "") {
-			Size size = new Size(width, height);
-  		int[] result = scale(imageScale.image, size);
-  		try {
-  			String fileTail = "_" + width + "_" + height + ".png";
-				saveImageAsFile(size.width, size.height, result, fileName + fileTail);
-				label.setIcon(new ImageIcon("./image/" + fileName + fileTail));
-				setTitle(width + "*" + height);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-  }
-
   public void add2_2_1Menu(JMenuBar menubar) {
     JMenu menu = new JMenu("2.2.1");
     menubar.add(menu);
@@ -244,6 +261,53 @@ class ImageViewerFrame extends JFrame {
     menu.add(scaleTo500_200);
   }
   
+  public void add2_3Menu(JMenuBar menubar) {
+  	JMenu menu = new JMenu("2.3");
+  	menubar.add(menu);
+  	
+  	JMenuItem quantizeTo128Level = new JMenuItem("quantize to 128 level");
+  	JMenuItem quantizeTo32Level = new JMenuItem("quantize to 32 level");
+  	JMenuItem quantizeTo8Level = new JMenuItem("quantize to 8 level");
+  	JMenuItem quantizeTo4Level = new JMenuItem("quantize to 4 level");
+  	JMenuItem quantizeTo2Level = new JMenuItem("quantize to 2 level");
+  	
+  	menu.add(quantizeTo128Level);
+  	menu.add(quantizeTo32Level);
+  	menu.add(quantizeTo8Level);
+  	menu.add(quantizeTo4Level);
+  	menu.add(quantizeTo2Level);
+  	
+  	quantizeTo128Level.addActionListener(new ActionListener() {
+  		@Override
+  		public void actionPerformed(ActionEvent arg0) {
+  			quantizeImageAndSaveTheFile(128);
+  		}
+  	});
+  	quantizeTo32Level.addActionListener(new ActionListener() {
+  		@Override
+  		public void actionPerformed(ActionEvent arg0) {
+  			quantizeImageAndSaveTheFile(32);
+  		}
+  	});
+  	quantizeTo8Level.addActionListener(new ActionListener() {
+  		@Override
+  		public void actionPerformed(ActionEvent arg0) {
+  			quantizeImageAndSaveTheFile(8);
+  		}
+  	});
+  	quantizeTo4Level.addActionListener(new ActionListener() {
+  		@Override
+  		public void actionPerformed(ActionEvent arg0) {
+  			quantizeImageAndSaveTheFile(4);
+  		}
+  	});
+  	quantizeTo2Level.addActionListener(new ActionListener() {
+  		@Override
+  		public void actionPerformed(ActionEvent arg0) {
+  			quantizeImageAndSaveTheFile(2);
+  		}
+  	});
+  }
 }
 
 class Size {
