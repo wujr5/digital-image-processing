@@ -1,6 +1,6 @@
 # Digital Image Processing
 
-> 2015年秋季 数字图像处理课程project代码
+> 2015年秋季 数字图像处理 课程project代码
 
 > 课程网站：[数字图像处理][]
 
