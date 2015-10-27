@@ -372,10 +372,119 @@ K比特图像一般是跟灰度级别一一对应的。
 
 ### 3.2 量化策略
 
-降低灰度级别，需要
+现在得到的图像是8比特图像，需要把原灰度级别映射到相应的从0到255之间划分的值。这个划分的gap就是需要降低到级别决定的。
+
+比如，2 level，也就是1比特图像，那么映射到0到255区间，就是0和255。比如4 level，也就是2比特图像，那么映射到0到255区间，就是0，85，170，255。
+
+现在的问题变成了怎样根据level的值来确定gap。
+
+根据这个思路，可以发现，2级别，相应地在0到255之间有1个`gap = 255`；4级别，相应地在0到255之间有3个`gap = 85`；
+
+以此类推，可以发现`gap = 255 / (level - 1)`。
+
+然后，可以将与原灰度值最接近的值作为量化后的灰度值。
 
 ### 3.3 实例代码分析
 
+```java
+
+import java.awt.image.BufferedImage;
+
+public class ImageQuantize {
+	public BufferedImage grayImage;
+	
+	public ImageQuantize(BufferedImage img) {
+		grayImage = changeRGBImageToGrayImage(img);
+	}
+	
+	public BufferedImage changeRGBImageToGrayImage(BufferedImage img) {
+		int width = img.getWidth();
+		int height = img.getHeight();
+		
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				int ARGB = img.getRGB(j, i);
+				img.setRGB(j, i, changeARGBToGray(ARGB));
+			}
+		}
+		return img;
+	}
+	
+	public int changeARGBToGray(int ARGB) {
+		int A = (ARGB >> 24) & 0xFF;
+		int R = (ARGB >> 16) & 0xFF;
+		int G = (ARGB >> 8) & 0xFF;
+		int B = ARGB & 0xFF;
+		
+		int gray = (int) (R * 0.3 + G * 0.59 + B * 0.11);
+		
+		int grayARGB = ((A << 24) & 0xFF000000)
+				| ((gray << 16) & 0x00FF0000)
+				| ((gray << 8) & 0x0000FF00)
+				| (gray & 0x000000FF);
+		
+		return grayARGB;
+	}
+	
+	public int changeAGRBByLevel(int gray, int gap) {
+		int A = (gray >> 24) & 0xFF;
+		int temp = gray & 0xFF;
+		
+		double ratio = ((double)temp - (int)(temp / gap) * gap) / gap;
+		if (ratio > 0.4) {
+			temp = (temp / gap + 1) * gap;
+			if (temp > 255) temp = 255;
+		} else {
+			temp = (temp / gap) * gap;
+		}
+		
+		int grayARGB = ((A << 24) & 0xFF000000)
+				| ((temp << 16) & 0x00FF0000)
+				| ((temp << 8) & 0x0000FF00)
+				| (temp & 0x000000FF);
+		
+		return grayARGB;
+	}
+	
+	public BufferedImage quantize(BufferedImage img, int level) {
+		int gap = (int) (256 / (level - 1));
+		int width = img.getWidth();
+		int height = img.getHeight();
+		
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				int grayARGB = img.getRGB(j, i);
+				img.setRGB(j, i, changeAGRBByLevel(grayARGB, gap));
+			}
+		}
+		return img;
+	}
+}
+
+```
+
+### 3.4 效果
+
+#### 3.4.1 128 level
+
+![](http://ww2.sinaimg.cn/large/ed796d65gw1exfqjnxxb4j20ao0743z5.jpg)
+
+#### 3.4.2 32 level
+
+![](http://ww3.sinaimg.cn/large/ed796d65gw1exfqjy8vhmj20ao07474z.jpg)
+
+#### 3.4.3 8 level
+
+![](http://ww4.sinaimg.cn/large/ed796d65gw1exfqk9amvrj20ao074q3p.jpg)
+
+#### 3.4.4 4 level
+
+![](http://ww3.sinaimg.cn/large/ed796d65gw1exfqkmtlztj20ao0740th.jpg)
+
+#### 3.4.5 2 level
+
+![](http://ww1.sinaimg.cn/large/ed796d65gw1exfqkyehnyj20ao074aak.jpg)
 
 
 ## 4 小程序展示
+
