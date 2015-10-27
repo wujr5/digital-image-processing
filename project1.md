@@ -327,6 +327,8 @@ public class BilineInterpolationScale {
 
 ```
 
+> 程序经过编译调试
+
 ### 2.3 处理效果
 
 #### 2.3.1 原图像 384*256
@@ -463,6 +465,8 @@ public class ImageQuantize {
 
 ```
 
+> 程序经过编译调试
+
 ### 3.4 效果
 
 #### 3.4.1 128 level
@@ -488,3 +492,12 @@ public class ImageQuantize {
 
 ## 4 小程序展示
 
+> 介绍一个完成以上功能的小程序，是利用上面介绍的代码生成的。可以在任何平台运行，并且能方便地看到效果。界面如下图所示。
+
+![](http://ww2.sinaimg.cn/large/ed796d65gw1exfqr46f3rj20y00y075v.jpg)
+
+![](http://ww2.sinaimg.cn/large/ed796d65gw1exfqrk8na1j20y00y0wiz.jpg)
+
+> github上也提供了该程序包。这里提供一个百度云分享链接下载。[ImageScaleAndQuantize]
+
+[ImageScaleAndQuantize]: http://pan.baidu.com/s/1qWHz1Ek
