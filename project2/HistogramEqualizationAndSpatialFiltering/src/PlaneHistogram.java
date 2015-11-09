@@ -1,14 +1,9 @@
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 /**
  * 柱状图
@@ -16,10 +11,11 @@ import javax.imageio.ImageIO;
  * @author lazy_p
  * @date 2010-3-20
  */
+
 public class PlaneHistogram {
-    private final int histogramWidth = 15;// 柱形图的宽度
-    private final int histogramPitch = 10;// 柱形图的间距
-    private float scaling = 1f;// 缩放的比例
+    private final int histogramWidth = 2;// 柱形图的宽度
+    private final int histogramPitch = 2;// 柱形图的间距
+    private float scaling = 2f;// 缩放的比例
     private int maxStrWidth = 0; // 字符串需要的最大宽度
 
     /**
@@ -83,18 +79,18 @@ public class PlaneHistogram {
             int y = height - 16 - (int) (v[i] * scaling); // 计算出Y坐标
 
             // 画占的比例
-            g.drawString(v[i] + "", x
-                    - ((metrics.stringWidth(v[i] + "") - histogramWidth) >> 1),
-                    y);
+//            g.drawString(v[i] + "", x
+//                    - ((metrics.stringWidth(v[i] + "") - histogramWidth) >> 1),
+//                    y);
 
             // 画平面的柱状图
             g.drawRect(x, y, histogramWidth, (int) (v[i] * scaling));
             g.fillRect(x, y, histogramWidth, (int) (v[i] * scaling));
 
             // 画每一项表示的东西
-            g.drawString(str[i], x
-                    - ((metrics.stringWidth(str[i]) - histogramWidth) >> 1),
-                    height - 2);
+//            g.drawString(str[i], x
+//                    - ((metrics.stringWidth(str[i]) - histogramWidth) >> 1),
+//                    height - 2);
         }
 
         return bufferImage;
@@ -109,7 +105,7 @@ public class PlaneHistogram {
     public float calculateScale(int[] v , int h){
         float scale = 1f;
         int max = Integer.MIN_VALUE;
-        for(int i=0 , len=v.length ; i < len ;++i){
+        for(int i=0 , len=v.length ; i < len; ++i) {
             if(v[i]>h && v[i]>max){
                 max=v[i];
             }
@@ -119,22 +115,4 @@ public class PlaneHistogram {
         }
         return scale;
     }
-    
-    public static void main(String[] args)  {
-        PlaneHistogram planeHistogram = new PlaneHistogram();
-
-        BufferedImage image = planeHistogram.paintPlaneHistogram("直方图",
-                        new int[]{10,20,1, 2, 3, 4, 5, 100,20,1, 2, 3, 4, 5}, 
-                        new String[]{"a" , "b" , "c", "a", "b" , "c", "a", "a" , "b" , "c", "a", "b" , "c", "a"} ,
-                        new Color[] {Color.RED, Color.GREEN, Color.BLACK, Color.BLUE, 
-                        		Color.GREEN, Color.BLACK, Color.BLUE,Color.RED, Color.GREEN, Color.BLACK, Color.BLUE, 
-                        		Color.GREEN, Color.BLACK, Color.BLUE });
-        File output = new File("./333.jpg");
-        try {
-            ImageIO.write(image, "jpg", output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
