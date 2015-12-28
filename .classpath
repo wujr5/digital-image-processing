@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="project1/ImageScaleAndQuantize/src"/>
+	<classpathentry kind="src" path="project2/HistogramEqualizationAndSpatialFiltering/src"/>
+	<classpathentry kind="lib" path="project1/ImageScaleAndQuantize.jar"/>
+	<classpathentry kind="lib" path="project2/HistogramEqualizationAndSpatialFiltering.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
